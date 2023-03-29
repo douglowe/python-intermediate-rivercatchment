@@ -10,10 +10,6 @@ time across all sites.
 import pandas as pd
 import numpy as np
 
-def data_normalise(data):
-    max = np.array(np.max(data, axis=0))
-    return data / max[np.newaxis, :]
-
 def read_variable_from_csv(filename):
     """Reads a named variable from a CSV file, and returns a
     pandas dataframe containing that variable. The CSV file must contain
@@ -41,23 +37,50 @@ def read_variable_from_csv(filename):
 
 def daily_total(data):
     """Calculate the daily total of a 2D data array.
-    Index must be np.datetime64 compatible format."""
+
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with total values of the measurements for each day.
+    """
     return data.groupby(data.index.date).sum()
 
 def daily_mean(data):
     """Calculate the daily mean of a 2D data array.
-    Index must be np.datetime64 compatible format."""
+
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with mean values of the measurements for each day.
+    """
     return data.groupby(data.index.date).mean()
 
 
 def daily_max(data):
-    """Calculate the daily max of a 2D data array.
-    Index must be np.datetime64 compatible format."""
+    """Calculate the daily maximum of a 2D data array.
+
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with maximum values of the measurements for each day.
+    """
     return data.groupby(data.index.date).max()
 
 
 def daily_min(data):
-    """Calculate the daily min of a 2D data array.
-    Index must be np.datetime64 compatible format."""
+    """Calculate the daily minimum of a 2D data array.
+
+    :param data: A 2D Pandas data frame with measurement data.
+                 Index must be np.datetime64 compatible format. Columns are measurement sites.
+    :returns: A 2D Pandas data frame with minimum values of the measurements for each day.
+    """
     return data.groupby(data.index.date).min()
 
+def data_normalise(data):
+    """Calculate the normalised values for each column in a given 2D array.
+    Range will be 0-1. But negative values are not screened out. And NaNs
+    in numpy arrays are not screened out either.
+
+    :param data: A 2D data array (numpy or pandas) with measurement data.
+    :returns: A 2D data array, of the same type as the input data array
+              with measurements normalised.
+    """
+    max = np.array(np.max(data, axis=0))
+    return data / max[np.newaxis, :]
