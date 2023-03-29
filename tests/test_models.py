@@ -32,7 +32,7 @@ def test_daily_min_python_list():
              pd.to_datetime('2000-01-01 02:00'),
              pd.to_datetime('2000-01-01 03:00')],
             ['A', 'B'],
-            [[3.0, 4.0]],
+            [[3.0, 14.0]],
             [datetime.date(2000, 1, 1)],
             ['A', 'B']
         ),
