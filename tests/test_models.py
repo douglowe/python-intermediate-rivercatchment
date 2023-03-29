@@ -39,30 +39,31 @@ def test_daily_min_python_list():
     with pytest.raises(AttributeError):
         error_expected = daily_min([[3, 4, 7],[-3, 0, 5]])
 
+testcase_daily_mean_zeros = \
+    (
+        [[0.0, 0.0], [0.0, 0.0], [0.0, 0.0]],
+        [pd.to_datetime('2000-01-01 01:00'),
+         pd.to_datetime('2000-01-01 02:00'),
+         pd.to_datetime('2000-01-01 03:00')],
+        ['A', 'B'],
+        [[0.0, 0.0]],
+        [datetime.date(2000, 1, 1)],
+        ['A', 'B']
+    )
+testcase_daily_mean_integers = \
+    (
+        [[1, 2], [3, 4], [5, 6]],
+        [pd.to_datetime('2000-01-01 01:00'),
+         pd.to_datetime('2000-01-01 02:00'),
+         pd.to_datetime('2000-01-01 03:00')],
+        ['A', 'B'],
+        [[3.0, 4.0]],
+        [datetime.date(2000, 1, 1)],
+        ['A', 'B']
+    )
 @pytest.mark.parametrize(
     "test_data, test_index, test_columns, expected_data, expected_index, expected_columns",
-    [
-        (
-            [ [0.0, 0.0], [0.0, 0.0], [0.0, 0.0] ],
-            [ pd.to_datetime('2000-01-01 01:00'),
-              pd.to_datetime('2000-01-01 02:00'),
-              pd.to_datetime('2000-01-01 03:00') ],
-            [ 'A', 'B' ],
-            [ [0.0, 0.0] ],
-            [ datetime.date(2000,1,1) ],
-            [ 'A', 'B' ]
-        ),
-        (
-            [[1, 2], [3, 4], [5, 6]],
-            [pd.to_datetime('2000-01-01 01:00'),
-             pd.to_datetime('2000-01-01 02:00'),
-             pd.to_datetime('2000-01-01 03:00')],
-            ['A', 'B'],
-            [[3.0, 4.0]],
-            [datetime.date(2000, 1, 1)],
-            ['A', 'B']
-        ),
-    ]
+    [testcase_daily_mean_zeros, testcase_daily_mean_integers]
 )
 def test_daily_mean(test_data, test_index, test_columns,
                          expected_data, expected_index, expected_columns):
@@ -71,6 +72,50 @@ def test_daily_mean(test_data, test_index, test_columns,
     pdt.assert_frame_equal(
         daily_mean(pd.DataFrame(data=test_data, index=test_index, columns=test_columns)),
         pd.DataFrame(data=expected_data, index=expected_index, columns=expected_columns))
+
+
+testcase_daily_mean_zeros_two = \
+    (
+        pd.DataFrame(
+            data=[[0.0, 0.0],
+                  [0.0, 0.0],
+                  [0.0, 0.0]],
+            index=[pd.to_datetime('2000-01-01 01:00'),
+                   pd.to_datetime('2000-01-01 02:00'),
+                   pd.to_datetime('2000-01-01 03:00')],
+            columns=['A', 'B']
+        ),
+        pd.DataFrame(
+            data=[[0.0, 0.0]],
+            index=[datetime.date(2000, 1, 1)],
+            columns=['A', 'B']
+        )
+    )
+testcase_daily_mean_integers_two = \
+    (
+        pd.DataFrame(
+            data=[[1, 2],
+                  [3, 4],
+                  [5, 6]],
+            index=[pd.to_datetime('2000-01-01 01:00'),
+                   pd.to_datetime('2000-01-01 02:00'),
+                   pd.to_datetime('2000-01-01 03:00')],
+            columns=['A', 'B']
+        ),
+        pd.DataFrame(
+            data=[[3.0, 4.0]],
+            index=[datetime.date(2000, 1, 1)],
+            columns=['A', 'B']
+        )
+    )
+@pytest.mark.parametrize(
+    "test_input, test_result",
+    [testcase_daily_mean_zeros_two, testcase_daily_mean_integers_two]
+)
+def test_daily_mean_two(test_input, test_result):
+    """Test mean function works with zeros and positive integers"""
+    from catchment.models import daily_mean
+    pdt.assert_frame_equal(daily_mean(test_input),test_result)
 
 
 def test_daily_mean_zeros():
