@@ -4,7 +4,52 @@ import pandas as pd
 import pandas.testing as pdt
 import datetime
 import pytest
-import numpy.testing as npt
+import geopandas as gpd
+from shapely.geometry import Point
+
+def test_create_site_with_position():
+    """Check a site is created correctly given a name."""
+    from catchment.models import Site
+    name = 'PL23'
+    longitude = 5
+    latitude = 5
+    position = gpd.GeoDataFrame(geometry=[Point((longitude,latitude))],crs='EPSG:4326')
+    p = Site(name = name, longitude = longitude, latitude = latitude)
+    assert p.location.geom_equals(position)[0]
+
+def test_create_catchment_with_shapefile():
+    """Check a catchment is created correctly given a simple shapefile."""
+    from catchment.models import Catchment
+    name = 'Pang'
+    shapefile = 'data/simple_shapefile/simple.shp'
+    position = gpd.GeoDataFrame.read_file(shapefile)
+    catchment = Catchment(name=name,shapefile=shapefile)
+    assert catchment.area.geom_equals(position)
+
+def test_site_in_catchment_added_correctly():
+    """Check sites within catchment are being added correctly."""
+    from catchment.models import Catchment, Site
+    shapefile = 'data/simple_shapefile/simple.shp'
+    catchment = Catchment(name='Pang',shapefile=shapefile)
+    longitude = 5
+    latitude = 5
+    PL23 = Site("PL23", longitude=longitude, latitude=latitude)
+    catchment.add_site(PL23)
+    assert catchment.sites is not None
+    assert len(catchment.sites) == 1
+
+def test_site_outside_catchment_excluded_correctly():
+    """Check sites outside catchment are being excluded."""
+    from catchment.models import Catchment, Site
+    shapefile = 'data/simple_shapefile/simple.shp'
+    catchment = Catchment(name='Pang',shapefile=shapefile)
+    longitude = -5
+    latitude = -5
+    PL23 = Site("PL23", longitude=longitude, latitude=latitude)
+    catchment.add_site(PL23)
+    assert catchment.sites is None
+
+
 
 
 @pytest.mark.parametrize(
